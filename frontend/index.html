@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FHEVM Private Data App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Private Data App</h1>
+  <p>Enter data to store in encrypted format:</p>
+  <input type="text" id="dataInput" placeholder="Enter your data" />
+  <button onclick="submitData()">Submit</button>
+
+  <h2>Encrypted Data:</h2>
+  <p id="encryptedData"></p>
+
+  <h2>Decrypted Data:</h2>
+  <p id="decryptedData"></p>
+
+  <!-- Include Ethers.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script>
+    // Replace with your contract address and ABI
+    const CONTRACT_ADDRESS = "0xYourContractAddressHere";
+    const CONTRACT_ABI = [
+      {
+        "constant": false,
+        "inputs": [
+          { "name": "_encryptedValue", "type": "uint256" }
+        ],
+        "name": "setEncryptedValue",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "getEncryptedValue",
+        "outputs": [
+          { "name": "", "type": "uint256" }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    // Connect to Ethereum network (e.g., FHEVM testnet)
+    const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+    async function submitData() {
+      const data = document.getElementById("dataInput").value;
+      const encryptedValue = await encryptWithFHE(data); // Replace with actual FHE encryption
+      const signer = provider.getSigner();
+      await contract.connect(signer).setEncryptedValue(encryptedValue);
+      document.getElementById("encryptedData").innerText = `Encrypted: ${encryptedValue}`;
+    }
+
+    async function decryptWithFHE(value) {
+      // Replace with actual FHE decryption logic
+      return value; // Placeholder
+    }
+
+    async function fetchEncryptedData() {
+      const encryptedValue = await contract.getEncryptedValue();
+      const decryptedValue = await decryptWithFHE(encryptedValue);
+      document.getElementById("decryptedData").innerText = `Decrypted: ${decryptedValue}`;
+    }
+
+    // Fetch data on page load
+    window.onload = fetchEncryptedData;
+  </script>
+</body>
+</html>
